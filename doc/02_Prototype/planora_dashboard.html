@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Planora — V1.0 Dashboard Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
+<style>
+  /* ========= Design tokens ========= */
+  :root {
+    --bg: #FAF9F6;
+    --surface: #FFFFFF;
+    --surface-2: #F5F3EE;
+    --border: #ECE8E0;
+    --border-strong: #DCD6CB;
+
+    --text: #1F1D1A;
+    --text-2: #5A5650;
+    --text-muted: #9A968E;
+
+    --accent: #6E5BD9;
+    --accent-soft: #EFEBFC;
+    --accent-strong: #5847C4;
+
+    --success: #5BA67A;
+    --warning: #E0A75E;
+    --danger:  #D9645B;
+
+    /* Category colors - soft pastels */
+    --cat-work-bg: #DCE9F5;     --cat-work-fg: #2F5C8A;
+    --cat-personal-bg: #F5DDE3; --cat-personal-fg: #8A3F55;
+    --cat-health-bg: #D9ECE0;   --cat-health-fg: #2E6E48;
+    --cat-social-bg: #F7E4C2;   --cat-social-fg: #8C6224;
+    --cat-study-bg: #E5DDF3;    --cat-study-fg: #5340A1;
+
+    --shadow-sm: 0 1px 2px rgba(40, 35, 25, 0.04), 0 1px 1px rgba(40, 35, 25, 0.02);
+    --shadow-md: 0 4px 12px rgba(40, 35, 25, 0.06), 0 1px 3px rgba(40, 35, 25, 0.04);
+    --shadow-lg: 0 16px 40px rgba(40, 35, 25, 0.12), 0 4px 12px rgba(40, 35, 25, 0.06);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, select, textarea { font: inherit; }
+
+  /* ========= App shell ========= */
+  .app {
+    display: grid;
+    grid-template-rows: 60px 1fr;
+    grid-template-columns: 240px 1fr 320px;
+    grid-template-areas:
+      "topbar topbar topbar"
+      "sidebar main rail";
+    height: 100vh;
+  }
+
+  /* ========= Top bar ========= */
+  .topbar {
+    grid-area: topbar;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    width: 220px; /* aligns with sidebar */
+  }
+  .brand-logo {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent) 0%, #9B8AED 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 14px;
+    box-shadow: 0 2px 8px rgba(110, 91, 217, 0.25);
+  }
+  .brand-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+  }
+  .search {
+    flex: 1; max-width: 480px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    color: var(--text-2);
+    transition: all 0.15s ease;
+  }
+  .search:focus-within {
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .search input {
+    flex: 1;
+    border: none; outline: none; background: transparent;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .search input::placeholder { color: var(--text-muted); }
+  .topbar-spacer { flex: 1; }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-2);
+    position: relative;
+    transition: background 0.12s ease;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn .dot {
+    position: absolute;
+    top: 8px; right: 9px;
+    width: 8px; height: 8px;
+    background: var(--danger);
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+  }
+
+  .today-btn {
+    padding: 7px 14px;
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--text);
+    font-weight: 500;
+    font-size: 13px;
+    transition: background 0.12s ease;
+  }
+  .today-btn:hover { background: var(--border); }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #F3D5A0 0%, #E8B5C2 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 12px;
+    color: #6B4A2E;
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--border-strong);
+  }
+
+  /* ========= Sidebar ========= */
+  .sidebar {
+    grid-area: sidebar;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 12px;
+    display: flex; flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+  }
+  .nav-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 12px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 12px;
+    border-radius: var(--radius-md);
+    color: var(--text-2);
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.12s ease, color 0.12s ease;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-item:hover { background: var(--surface-2); color: var(--text); }
+  .nav-item.active {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+  .nav-item.active svg { color: var(--accent); }
+  .nav-item .badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--border);
+    color: var(--text-2);
+  }
+  .nav-item.active .badge { background: var(--accent); color: white; }
+
+  .sidebar-spacer { flex: 1; }
+
+  .calendars-list { display: flex; flex-direction: column; gap: 2px; }
+  .cal-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-2);
+    transition: background 0.12s ease;
+  }
+  .cal-item:hover { background: var(--surface-2); }
+  .cal-dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+  }
+
+  /* ========= Main ========= */
+  .main {
+    grid-area: main;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    background: var(--bg);
+  }
+  .main-header {
+    padding: 18px 24px 14px;
+    display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .header-title {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .header-title h1 {
+    margin: 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .header-title .sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .nav-arrows {
+    display: flex; gap: 4px;
+    margin-left: 12px;
+  }
+  .nav-arrows .icon-btn { width: 30px; height: 30px; }
+
+  .view-tabs {
+    margin-left: auto;
+    display: flex;
+    background: var(--surface-2);
+    padding: 3px;
+    border-radius: var(--radius-md);
+    gap: 2px;
+  }
+  .view-tab {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    border-radius: 9px;
+    transition: all 0.15s ease;
+  }
+  .view-tab:hover { color: var(--text); }
+  .view-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ========= Calendar week view ========= */
+  .calendar-wrap {
+    flex: 1;
+    overflow: auto;
+    background: var(--surface);
+  }
+  .week-header {
+    display: grid;
+    grid-template-columns: 56px repeat(7, 1fr);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--surface);
+    z-index: 5;
+  }
+  .week-corner { border-right: 1px solid var(--border); }
+  .day-head {
+    padding: 12px 12px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .day-head:last-child { border-right: none; }
+  .day-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .day-num {
+    margin-top: 4px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--text);
+  }
+  .day-head.today .day-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+  }
+  .day-head.today .day-name { color: var(--accent); }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: 56px repeat(7, 1fr);
+    position: relative;
+  }
+  .time-col {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .time-slot {
+    height: 56px;
+    padding: 4px 8px 0 0;
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-bottom: 1px solid transparent;
+  }
+  .day-col {
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .day-col:last-child { border-right: none; }
+  .hour-cell {
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s ease;
+  }
+  .hour-cell:hover { background: var(--surface-2); }
+
+  .now-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--danger);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .now-line::before {
+    content: '';
+    position: absolute;
+    left: -5px; top: -4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--danger);
+  }
+
+  .event {
+    position: absolute;
+    left: 4px; right: 4px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    border-left: 3px solid;
+    line-height: 1.35;
+  }
+  .event:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    z-index: 4;
+  }
+  .event .ev-title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .event .ev-time {
+    font-size: 10.5px;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+  .event .ev-icon {
+    display: inline-flex;
+    margin-right: 4px;
+    vertical-align: -2px;
+  }
+  .ev-work { background: var(--cat-work-bg);     color: var(--cat-work-fg);     border-color: var(--cat-work-fg); }
+  .ev-personal { background: var(--cat-personal-bg); color: var(--cat-personal-fg); border-color: var(--cat-personal-fg); }
+  .ev-health { background: var(--cat-health-bg);   color: var(--cat-health-fg);   border-color: var(--cat-health-fg); }
+  .ev-social { background: var(--cat-social-bg);   color: var(--cat-social-fg);   border-color: var(--cat-social-fg); }
+  .ev-study { background: var(--cat-study-bg);    color: var(--cat-study-fg);    border-color: var(--cat-study-fg); }
+
+  /* ========= Right rail ========= */
+  .rail {
+    grid-area: rail;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 18px 18px 24px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .rail-section {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .rail-head {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .rail-head h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.005em;
+  }
+  .rail-head .meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .text-link {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .text-link:hover { color: var(--accent-strong); text-decoration: underline; }
+
+  /* Tasks */
+  .task-progress {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .task-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent) 0%, #9B8AED 100%);
+    border-radius: 999px;
+    width: 43%;
+    transition: width 0.3s ease;
+  }
+  .task-list { display: flex; flex-direction: column; gap: 2px; }
+  .task {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.1s ease;
+  }
+  .task:hover { background: var(--surface-2); }
+  .task-check {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    transition: all 0.15s ease;
+  }
+  .task.done .task-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .task.done .task-text {
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+  .task-text {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .task-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .priority-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #FCE9E2;
+    color: #9C3E2F;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+
+  /* Schedule requests */
+  .request-card {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .request-head {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .friend-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .fa-anna { background: #D9ECE0; color: #2E6E48; }
+  .fa-marcus { background: #DCE9F5; color: #2F5C8A; }
+  .fa-sarah { background: #F5DDE3; color: #8A3F55; }
+  .request-name { font-weight: 600; font-size: 13px; }
+  .request-detail { font-size: 12px; color: var(--text-2); }
+  .request-time { font-size: 12px; color: var(--text); font-weight: 500; }
+  .request-actions { display: flex; gap: 6px; margin-top: 2px; }
+  .request-actions button {
+    flex: 1;
+    padding: 6px 0;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.12s ease;
+  }
+  .btn-accept {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-accept:hover { background: var(--accent-strong); }
+  .btn-propose {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .btn-propose:hover { background: var(--border); }
+  .btn-decline {
+    background: var(--surface-2);
+    color: var(--text-2);
+  }
+  .btn-decline:hover { background: #FCE9E2; color: var(--danger); }
+
+  /* Friends */
+  .friend-list { display: flex; flex-direction: column; gap: 2px; }
+  .friend {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.1s ease;
+  }
+  .friend:hover { background: var(--surface-2); }
+  .friend-info { flex: 1; }
+  .friend-name { font-size: 13px; font-weight: 500; }
+  .friend-status { font-size: 11px; color: var(--text-muted); }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .status-free { background: var(--success); }
+  .status-busy { background: var(--warning); }
+  .status-offline { background: var(--text-muted); }
+
+  /* ========= FAB ========= */
+  .fab {
+    position: fixed;
+    right: 340px; bottom: 24px;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(110, 91, 217, 0.45);
+    transition: all 0.18s ease;
+    z-index: 20;
+  }
+  .fab:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 10px 28px rgba(110, 91, 217, 0.55);
+  }
+
+  /* ========= Modal ========= */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(31, 29, 26, 0.4);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    animation: fade-in 0.18s ease;
+  }
+  .modal-overlay.open { display: flex; }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 460px;
+    max-width: 92vw;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slide-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-head {
+    padding: 18px 22px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-head h2 {
+    margin: 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+  .modal-body {
+    padding: 18px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .modal-foot {
+    padding: 12px 22px 18px;
+    display: flex; gap: 8px; justify-content: flex-end;
+    border-top: 1px solid var(--border);
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+  .input, .select, .textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.12s ease;
+  }
+  .input:focus, .select:focus, .textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .textarea { resize: vertical; min-height: 64px; font-family: inherit; }
+
+  .pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill {
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-2);
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.12s ease;
+  }
+  .pill::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bg-color, var(--border-strong));
+  }
+  .pill[data-cat="work"]::before { background: var(--cat-work-fg); }
+  .pill[data-cat="personal"]::before { background: var(--cat-personal-fg); }
+  .pill[data-cat="health"]::before { background: var(--cat-health-fg); }
+  .pill[data-cat="social"]::before { background: var(--cat-social-fg); }
+  .pill[data-cat="study"]::before { background: var(--cat-study-fg); }
+  .pill.active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+  .pill:hover { border-color: var(--text-muted); }
+
+  .visibility-group { display: flex; gap: 6px; }
+  .vis-btn {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.12s ease;
+  }
+  .vis-btn:hover { border-color: var(--text-muted); }
+  .vis-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.12s ease;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; color: var(--text-2); }
+  .btn-ghost:hover { background: var(--surface-2); }
+
+  /* ========= Tooltip helper ========= */
+  .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 4px 0 0;
+  }
+
+  /* ========= Scrollbar (subtle) ========= */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ========= Footer note ========= */
+  .proto-note {
+    position: fixed;
+    left: 12px; bottom: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--text-muted);
+    box-shadow: var(--shadow-sm);
+    z-index: 50;
+  }
+  .proto-note strong { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">P</div>
+      <span class="brand-name">Planora</span>
+    </div>
+
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="Search events, tasks, friends…" />
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="top-actions">
+      <button class="today-btn" onclick="goToToday()">Today</button>
+      <button class="icon-btn" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="dot"></span>
+      </button>
+      <button class="icon-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <div class="avatar" title="Alif">A</div>
+    </div>
+  </header>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="nav-section-label">Workspace</div>
+    <button class="nav-item active" data-nav="calendar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Calendar
+    </button>
+    <button class="nav-item" data-nav="tasks">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tasks
+      <span class="badge">7</span>
+    </button>
+    <button class="nav-item" data-nav="routines">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.4 0 4.6.94 6.2 2.5"/><path d="M21 3v6h-6"/></svg>
+      Routines
+    </button>
+    <button class="nav-item" data-nav="friends">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Friends
+    </button>
+    <button class="nav-item" data-nav="requests">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Requests
+      <span class="badge">2</span>
+    </button>
+
+    <div class="nav-section-label">Calendars</div>
+    <div class="calendars-list">
+      <div class="cal-item"><span class="cal-dot" style="background: var(--cat-work-fg)"></span> Work</div>
+      <div class="cal-item"><span class="cal-dot" style="background: var(--cat-personal-fg)"></span> Personal</div>
+      <div class="cal-item"><span class="cal-dot" style="background: var(--cat-health-fg)"></span> Health</div>
+      <div class="cal-item"><span class="cal-dot" style="background: var(--cat-social-fg)"></span> Social</div>
+      <div class="cal-item"><span class="cal-dot" style="background: var(--cat-study-fg)"></span> Study</div>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <button class="nav-item" data-nav="settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+    <div class="main-header">
+      <div class="header-title">
+        <h1>April 27 – May 3, 2026</h1>
+        <span class="sub">Week 18 · Friday is today</span>
+      </div>
+      <div class="nav-arrows">
+        <button class="icon-btn" title="Previous week">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="icon-btn" title="Next week">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <div class="view-tabs">
+        <button class="view-tab" data-view="day">Day</button>
+        <button class="view-tab active" data-view="week">Week</button>
+        <button class="view-tab" data-view="month">Month</button>
+        <button class="view-tab" data-view="year">Year</button>
+      </div>
+    </div>
+
+    <div class="calendar-wrap">
+      <div class="week-header">
+        <div class="week-corner"></div>
+        <div class="day-head"><div class="day-name">Mon</div><div class="day-num">27</div></div>
+        <div class="day-head"><div class="day-name">Tue</div><div class="day-num">28</div></div>
+        <div class="day-head"><div class="day-name">Wed</div><div class="day-num">29</div></div>
+        <div class="day-head"><div class="day-name">Thu</div><div class="day-num">30</div></div>
+        <div class="day-head today"><div class="day-name">Fri</div><div class="day-num">1</div></div>
+        <div class="day-head"><div class="day-name">Sat</div><div class="day-num">2</div></div>
+        <div class="day-head"><div class="day-name">Sun</div><div class="day-num">3</div></div>
+      </div>
+
+      <div class="week-grid" id="weekGrid">
+        <!-- time column -->
+        <div class="time-col">
+          <div class="time-slot">8 AM</div>
+          <div class="time-slot">9 AM</div>
+          <div class="time-slot">10 AM</div>
+          <div class="time-slot">11 AM</div>
+          <div class="time-slot">12 PM</div>
+          <div class="time-slot">1 PM</div>
+          <div class="time-slot">2 PM</div>
+          <div class="time-slot">3 PM</div>
+          <div class="time-slot">4 PM</div>
+          <div class="time-slot">5 PM</div>
+          <div class="time-slot">6 PM</div>
+          <div class="time-slot">7 PM</div>
+          <div class="time-slot">8 PM</div>
+          <div class="time-slot">9 PM</div>
+        </div>
+
+        <!-- 7 day columns - each has hour cells + absolutely positioned events -->
+        <!-- Hour scale: each hour = 56px. Start = 8 AM = 0px -->
+
+        <!-- Mon -->
+        <div class="day-col">
+          <div class="hour-cell" data-day="1" data-hour="8"></div>
+          <div class="hour-cell" data-day="1" data-hour="9"></div>
+          <div class="hour-cell" data-day="1" data-hour="10"></div>
+          <div class="hour-cell" data-day="1" data-hour="11"></div>
+          <div class="hour-cell" data-day="1" data-hour="12"></div>
+          <div class="hour-cell" data-day="1" data-hour="13"></div>
+          <div class="hour-cell" data-day="1" data-hour="14"></div>
+          <div class="hour-cell" data-day="1" data-hour="15"></div>
+          <div class="hour-cell" data-day="1" data-hour="16"></div>
+          <div class="hour-cell" data-day="1" data-hour="17"></div>
+          <div class="hour-cell" data-day="1" data-hour="18"></div>
+          <div class="hour-cell" data-day="1" data-hour="19"></div>
+          <div class="hour-cell" data-day="1" data-hour="20"></div>
+          <div class="hour-cell" data-day="1" data-hour="21"></div>
+          <!-- events: 8AM offset = (h - 8) * 56 -->
+          <div class="event ev-work"   style="top: 56px;  height: 50px;" onclick="openEventDetail('Standup')">
+            <div class="ev-title">Team Standup</div><div class="ev-time">9:00 – 9:45</div>
+          </div>
+          <div class="event ev-social" style="top: 224px; height: 56px;" onclick="openEventDetail('Lunch with Sarah')">
+            <div class="ev-title">Lunch with Sarah</div><div class="ev-time">12:00 – 1:00</div>
+          </div>
+          <div class="event ev-health" style="top: 560px; height: 56px;" onclick="openEventDetail('Yoga')">
+            <div class="ev-title">Yoga Class</div><div class="ev-time">6:00 – 7:00</div>
+          </div>
+        </div>
+
+        <!-- Tue -->
+        <div class="day-col">
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="event ev-work"   style="top: 112px; height: 56px;" onclick="openEventDetail('Design Review')">
+            <div class="ev-title">Design Review</div><div class="ev-time">10:00 – 11:00</div>
+          </div>
+          <div class="event ev-study"  style="top: 168px; height: 84px;" onclick="openEventDetail('Deep Work')">
+            <div class="ev-title">Term paper writing</div><div class="ev-time">11:00 – 12:30</div>
+          </div>
+          <div class="event ev-health" style="top: 392px; height: 56px;" onclick="openEventDetail('Therapy')">
+            <div class="ev-title">Therapy</div><div class="ev-time">3:00 – 4:00</div>
+          </div>
+          <div class="event ev-social" style="top: 616px; height: 112px;" onclick="openEventDetail('Movie Night')">
+            <div class="ev-title">Movie Night 🎬</div><div class="ev-time">7:00 – 9:00</div>
+          </div>
+        </div>
+
+        <!-- Wed -->
+        <div class="day-col">
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="event ev-work"   style="top: 56px;  height: 168px;" onclick="openEventDetail('Deep Work Block')">
+            <div class="ev-title">Deep Work Block</div><div class="ev-time">9:00 – 12:00</div>
+            <div class="ev-time" style="margin-top: 4px;">📵 Focus mode</div>
+          </div>
+          <div class="event ev-health" style="top: 336px; height: 56px;" onclick="openEventDetail('Dentist')">
+            <div class="ev-title">Dentist</div><div class="ev-time">2:00 – 3:00</div>
+          </div>
+          <div class="event ev-personal" style="top: 560px; height: 56px;" onclick="openEventDetail('Cook Dinner')">
+            <div class="ev-title">Cook dinner</div><div class="ev-time">6:00 – 7:00</div>
+          </div>
+        </div>
+
+        <!-- Thu -->
+        <div class="day-col">
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="event ev-social" style="top: 168px; height: 56px;" onclick="openEventDetail('Coffee with Alex')">
+            <div class="ev-title">Coffee with Alex</div><div class="ev-time">11:00 – 12:00</div>
+          </div>
+          <div class="event ev-work"   style="top: 336px; height: 112px;" onclick="openEventDetail('Project Planning')">
+            <div class="ev-title">Project Planning</div><div class="ev-time">2:00 – 4:00</div>
+          </div>
+          <div class="event ev-health" style="top: 616px; height: 56px;" onclick="openEventDetail('Run')">
+            <div class="ev-title">Evening Run 🏃</div><div class="ev-time">7:00 – 8:00</div>
+          </div>
+        </div>
+
+        <!-- Fri (today) -->
+        <div class="day-col" id="todayCol" style="background: rgba(110, 91, 217, 0.025);">
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="event ev-work"   style="top: 112px; height: 56px;" onclick="openEventDetail('Team Sync')">
+            <div class="ev-title">Team Sync</div><div class="ev-time">10:00 – 11:00</div>
+          </div>
+          <div class="event ev-personal" style="top: 280px; height: 56px;" onclick="openEventDetail('Lunch')">
+            <div class="ev-title">Lunch break</div><div class="ev-time">1:00 – 2:00</div>
+          </div>
+          <div class="event ev-health" style="top: 504px; height: 56px;" onclick="openEventDetail('Dentist Follow-up')">
+            <div class="ev-title">Dentist follow-up</div><div class="ev-time">5:00 – 6:00</div>
+          </div>
+          <!-- now-line at 2:30 PM = (14.5 - 8) * 56 = 364px -->
+          <div class="now-line" style="top: 364px;"></div>
+        </div>
+
+        <!-- Sat -->
+        <div class="day-col">
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="event ev-social" style="top: 112px; height: 112px;" onclick="openEventDetail('Hike')">
+            <div class="ev-title">Hike with friends</div><div class="ev-time">10:00 – 12:00</div>
+          </div>
+          <div class="event ev-personal" style="top: 392px; height: 56px;" onclick="openEventDetail('Reading')">
+            <div class="ev-title">Reading time</div><div class="ev-time">3:00 – 4:00</div>
+          </div>
+        </div>
+
+        <!-- Sun -->
+        <div class="day-col">
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="hour-cell"></div><div class="hour-cell"></div>
+          <div class="event ev-social" style="top: 168px; height: 56px;" onclick="openEventDetail('Brunch')">
+            <div class="ev-title">Brunch with family</div><div class="ev-time">11:00 – 12:00</div>
+          </div>
+          <div class="event ev-personal" style="top: 560px; height: 56px;" onclick="openEventDetail('Plan Week')">
+            <div class="ev-title">Plan next week</div><div class="ev-time">6:00 – 7:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== RIGHT RAIL ===== -->
+  <aside class="rail">
+    <!-- Tasks -->
+    <section class="rail-section">
+      <div class="rail-head">
+        <h3>Today's Tasks</h3>
+        <span class="meta">3 of 7</span>
+      </div>
+      <div class="task-progress"><div class="task-progress-bar"></div></div>
+      <div class="task-list">
+        <div class="task done" onclick="toggleTask(this)">
+          <div class="task-check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="task-text">Morning meditation (10 min)</div>
+        </div>
+        <div class="task done" onclick="toggleTask(this)">
+          <div class="task-check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="task-text">Reply to Anna about project</div>
+        </div>
+        <div class="task done" onclick="toggleTask(this)">
+          <div class="task-check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="task-text">Pay electricity bill</div>
+        </div>
+        <div class="task" onclick="toggleTask(this)">
+          <div class="task-check"></div>
+          <div class="task-text">
+            Submit term paper draft<span class="priority-pill">High</span>
+            <div class="task-meta">Due today · 11:59 PM</div>
+          </div>
+        </div>
+        <div class="task" onclick="toggleTask(this)">
+          <div class="task-check"></div>
+          <div class="task-text">
+            Buy groceries
+            <div class="task-meta">5 items · personal</div>
+          </div>
+        </div>
+        <div class="task" onclick="toggleTask(this)">
+          <div class="task-check"></div>
+          <div class="task-text">
+            Call mom
+            <div class="task-meta">↻ Weekly · every Friday</div>
+          </div>
+        </div>
+        <div class="task" onclick="toggleTask(this)">
+          <div class="task-check"></div>
+          <div class="task-text">Read for 30 minutes</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schedule Requests -->
+    <section class="rail-section">
+      <div class="rail-head">
+        <h3>Schedule Requests</h3>
+        <a class="text-link" href="#">View all</a>
+      </div>
+
+      <div class="request-card">
+        <div class="request-head">
+          <div class="friend-avatar fa-anna">A</div>
+          <div>
+            <div class="request-name">Anna Becker</div>
+            <div class="request-detail">Wants to schedule "Coffee chat"</div>
+          </div>
+        </div>
+        <div class="request-time">📅 Sat May 2 · 3:00 – 4:00 PM</div>
+        <div class="request-actions">
+          <button class="btn-accept">Accept</button>
+          <button class="btn-propose">Propose</button>
+          <button class="btn-decline">Decline</button>
+        </div>
+      </div>
+
+      <div class="request-card">
+        <div class="request-head">
+          <div class="friend-avatar fa-marcus">M</div>
+          <div>
+            <div class="request-name">Marcus Lee</div>
+            <div class="request-detail">Wants to schedule "Study session"</div>
+          </div>
+        </div>
+        <div class="request-time">📅 Sun May 3 · 2:00 – 5:00 PM</div>
+        <div class="request-actions">
+          <button class="btn-accept">Accept</button>
+          <button class="btn-propose">Propose</button>
+          <button class="btn-decline">Decline</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Friends -->
+    <section class="rail-section">
+      <div class="rail-head">
+        <h3>Friends</h3>
+        <span class="meta">3 free now</span>
+      </div>
+      <div class="friend-list">
+        <div class="friend">
+          <div class="friend-avatar fa-anna">A</div>
+          <div class="friend-info">
+            <div class="friend-name">Anna Becker</div>
+            <div class="friend-status">Free now</div>
+          </div>
+          <div class="status-dot status-free"></div>
+        </div>
+        <div class="friend">
+          <div class="friend-avatar fa-marcus">M</div>
+          <div class="friend-info">
+            <div class="friend-name">Marcus Lee</div>
+            <div class="friend-status">Busy until 3:00 PM</div>
+          </div>
+          <div class="status-dot status-busy"></div>
+        </div>
+        <div class="friend">
+          <div class="friend-avatar fa-sarah">S</div>
+          <div class="friend-info">
+            <div class="friend-name">Sarah Park</div>
+            <div class="friend-status">Free now</div>
+          </div>
+          <div class="status-dot status-free"></div>
+        </div>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<!-- FAB -->
+<button class="fab" title="New event" onclick="openModal()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- ===== Modal: New Event ===== -->
+<div class="modal-overlay" id="newEventModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h2>New Event</h2>
+      <button class="icon-btn" onclick="closeModal()" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="field">
+        <label>Title</label>
+        <input class="input" placeholder="Add a title…" autofocus />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Start</label>
+          <input class="input" type="datetime-local" value="2026-05-01T15:00" />
+        </div>
+        <div class="field">
+          <label>End</label>
+          <input class="input" type="datetime-local" value="2026-05-01T16:00" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+        <div class="pill-group" id="catPills">
+          <button class="pill active" data-cat="work">Work</button>
+          <button class="pill" data-cat="personal">Personal</button>
+          <button class="pill" data-cat="health">Health</button>
+          <button class="pill" data-cat="social">Social</button>
+          <button class="pill" data-cat="study">Study</button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Recurrence</label>
+          <select class="select">
+            <option>None</option>
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+            <option>Custom…</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Reminder</label>
+          <select class="select">
+            <option>15 minutes before</option>
+            <option>30 minutes before</option>
+            <option>1 hour before</option>
+            <option>1 day before</option>
+            <option>None</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Visibility</label>
+        <div class="visibility-group" id="visGroup">
+          <button class="vis-btn active" data-vis="private">🔒 Private</button>
+          <button class="vis-btn" data-vis="friends">👥 Friends see busy</button>
+          <button class="vis-btn" data-vis="shared">🌐 Shared</button>
+        </div>
+        <div class="hint">Friends-mode shows your time as busy without revealing details.</div>
+      </div>
+
+      <div class="field">
+        <label>Location <span style="color: var(--text-muted); font-weight: 400;">(optional)</span></label>
+        <input class="input" placeholder="Add location…" />
+      </div>
+
+      <div class="field">
+        <label>Notes <span style="color: var(--text-muted); font-weight: 400;">(optional)</span></label>
+        <textarea class="textarea" placeholder="Add any details…"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal()">Save event</button>
+    </div>
+  </div>
+</div>
+
+<div class="proto-note">
+  <strong>Planora</strong> · V1.0 dashboard prototype
+</div>
+
+<script>
+  // Modal control
+  function openModal() {
+    document.getElementById('newEventModal').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('newEventModal').classList.remove('open');
+  }
+  // ESC closes modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Pill (category) selection
+  document.querySelectorAll('#catPills .pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('#catPills .pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    });
+  });
+  // Visibility selection
+  document.querySelectorAll('#visGroup .vis-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#visGroup .vis-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+
+  // View tabs
+  document.querySelectorAll('.view-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.view-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  // Sidebar nav
+  document.querySelectorAll('.sidebar .nav-item').forEach(n => {
+    n.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar .nav-item').forEach(x => x.classList.remove('active'));
+      n.classList.add('active');
+    });
+  });
+
+  // Tasks toggle
+  function toggleTask(el) {
+    el.classList.toggle('done');
+    if (el.classList.contains('done') && !el.querySelector('.task-check svg')) {
+      el.querySelector('.task-check').innerHTML =
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else if (!el.classList.contains('done')) {
+      el.querySelector('.task-check').innerHTML = '';
+    }
+    updateProgress();
+  }
+  function updateProgress() {
+    const total = document.querySelectorAll('.task').length;
+    const done = document.querySelectorAll('.task.done').length;
+    const pct = total ? (done / total * 100) : 0;
+    document.querySelector('.task-progress-bar').style.width = pct + '%';
+    document.querySelector('.rail-section .meta').textContent = `${done} of ${total}`;
+  }
+
+  // Quick "go to today" — scrolls calendar to current time
+  function goToToday() {
+    const wrap = document.querySelector('.calendar-wrap');
+    // scroll so that the now-line area (~14:30) is roughly in view
+    wrap.scrollTo({ top: 280, behavior: 'smooth' });
+  }
+
+  // Event detail click — placeholder
+  function openEventDetail(name) {
+    // In a real app, this would open a read-only event details popover.
+    // For the prototype, we just open the editor modal.
+    openModal();
+  }
+
+  // Auto-scroll on load to morning view
+  window.addEventListener('load', () => {
+    document.querySelector('.calendar-wrap').scrollTop = 60;
+  });
+</script>
+
+</body>
+</html>
