@@ -1,0 +1,2 @@
+"""Blocalm FastAPI application package."""
+
