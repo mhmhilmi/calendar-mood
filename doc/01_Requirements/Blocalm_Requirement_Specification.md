@@ -1,4 +1,4 @@
-# Planora
+# Blocalm
 
 ## Software Requirements Specification
 
@@ -6,21 +6,21 @@
 
 | Field | Value |
 | --- | --- |
-| Project | Planora |
+| Project | Blocalm |
 | Document Type | Software Requirements Specification (SRS) |
 | Version | 0.2 |
-| Source Document | `Planora_Software_Requirements_Plan.docx` |
-| Format Reference | `Requirement_Specification.docx` |
+| Source Basis | Original Planora requirements plan content |
+| Format Reference | RUP-style requirements specification template |
 | Date | 01.05.2026 |
 | Prepared by | Project Team |
 
-Planora helps users plan their time, structure daily routines, and coordinate trusted availability while keeping personal data private by default.
+Blocalm helps users plan their time, structure daily routines, and coordinate trusted availability while keeping personal data private by default.
 
 ## Change History
 
 | Date | Version | Change | Author(s) |
 | --- | --- | --- | --- |
-| 01.05.2026 | 0.1 | Initial creation of the Software Requirements Plan for Planora. | Project Team |
+| 01.05.2026 | 0.1 | Initial creation of the Software Requirements Plan for Blocalm. | Project Team |
 | 20.05.2026 | 0.2 | Rewritten as a Markdown Software Requirements Specification using the provided requirements specification format as reference. | Project Team |
 
 ## Table of Contents
@@ -41,15 +41,17 @@ The introduction defines the purpose, scope, terms, references, and structure of
 
 ### 1.1 Purpose
 
-The purpose of this Software Requirements Specification is to define the functional and non-functional requirements for Planora Version 1.0. The document converts the existing requirements plan into a more implementation-ready specification.
+Blocalm is the official product name used throughout this specification.
 
-Planora is planned as a local-first personal productivity and scheduling application. The first version focuses on calendar and planner functionality. Future versions may include journaling, mood tracking, visual mood summaries, and machine-learning-based mood pattern analysis.
+The purpose of this Software Requirements Specification is to define the functional and non-functional requirements for Blocalm Version 1.0. The document converts the existing requirements plan into a more implementation-ready specification.
+
+Blocalm is planned as a local-first personal productivity and scheduling application. The first version focuses on calendar and planner functionality. Future versions may include journaling, mood tracking, visual mood summaries, and machine-learning-based mood pattern analysis.
 
 This SRS supports requirement review, implementation planning, testing, and traceability. Each requirement is written so that it can be reviewed, implemented, and verified through a related use case or test case.
 
 ### 1.2 Scope
 
-This specification covers Planora Version 1.0. The first implemented version focuses on personal scheduling and trusted coordination between users.
+This specification covers Blocalm Version 1.0. The first implemented version focuses on personal scheduling and trusted coordination between users.
 
 Version 1.0 includes:
 
@@ -78,25 +80,31 @@ The following features are future extensions and are not part of the detailed Ve
 | --- | --- |
 | API | Application Programming Interface |
 | Backend | Server-side logic that handles shared features, user accounts, requests, and synchronization |
-| CMake | Build system generator used to compile and configure the project |
+| Dart | Programming language used by Flutter applications |
 | DB | Database |
+| Docker Compose | Tool used to run backend services and databases together in a repeatable local development environment |
+| Drift | Flutter/Dart persistence library used with SQLite for local app data |
+| FastAPI | Python web framework planned for the backend REST API |
+| Figma | Design and prototyping tool used for UI design, user-flow exploration, and developer handoff |
+| Flutter | Cross-platform UI framework used to build mobile, desktop, and web applications from a shared codebase |
 | GDPR | General Data Protection Regulation |
 | GUI | Graphical User Interface |
 | Local-first | Architecture in which personal data is stored locally by default and synchronized only when necessary |
 | MVP | Minimum Viable Product |
-| Qt | Framework used for the desktop application graphical user interface |
+| PostgreSQL | Relational database planned for backend/shared data |
 | REST | Representational State Transfer |
 | Server | Environment where the backend service runs |
+| SQLite | Local relational database used on the app client for private planning data |
 | SRP | Software Requirements Plan |
 | SRS | Software Requirements Specification |
 
 ### 1.4 References
 
-- Provided project template: `Requirement_Specification.docx`.
-- Source requirements plan: `Planora_Software_Requirements_Plan.docx`.
-- UI prototype: `doc/02_Prototype/planora_dashboard.html`.
-- Internal project discussion and agreed project scope for Planora.
-- Planned technologies: Qt, CMake, local database, backend API, and optional Docker environment.
+- Provided project template: RUP-style requirements specification format.
+- Source basis: original Planora requirements plan content.
+- UI prototype: `doc/02_Prototype/Blocalm_dashboard.html`.
+- Internal project discussion and agreed project scope for Blocalm.
+- Planned technologies: Figma for design/prototyping, Flutter and Dart for the cross-platform frontend, Drift/SQLite for private local app storage, FastAPI for the backend REST API, PostgreSQL for backend/shared data, and Docker Compose for local backend development.
 
 ### 1.5 Overview
 
@@ -108,23 +116,27 @@ The overall description analyzes the software context by presenting the product 
 
 ### 2.1 Product Perspective
 
-Planora is a personal productivity and reflection platform that helps users plan their time, manage daily routines, coordinate availability with trusted people, and later understand emotional patterns through journaling and mood tracking.
+Blocalm is a personal productivity and reflection platform that helps users plan their time, manage daily routines, coordinate availability with trusted people, and later understand emotional patterns through journaling and mood tracking.
 
-Planora Version 1.0 will be developed as a desktop application using Qt and CMake. The system follows a local-first approach. Personal calendar and task data should be stored locally on the user's device. Features that involve other users, such as friend connections, shared availability, schedule requests, and synchronized notifications, require a lightweight backend service.
+Blocalm Version 1.0 will be developed as a cross-platform application using Flutter as the preferred frontend framework. The same frontend codebase should support mobile and desktop targets where practical. Figma will be used for UI design, prototyping, and developer handoff, while the production frontend will be implemented in Flutter rather than directly in Figma.
 
-During development, the backend can run locally on the developers' computers. Docker may be used to simplify the setup of backend and database services. No paid server is required for the first development phase.
+The system follows a local-first approach. Personal calendar and task data should be stored locally on the user's device using Drift/SQLite. Features that involve other users, such as account login, friend connections, shared availability, schedule requests, shared events, and synchronized notifications, require a lightweight backend service.
+
+The backend should be implemented as a FastAPI REST API with PostgreSQL as the backend/shared database. During development, Docker Compose should run the FastAPI service and PostgreSQL database together so all developers can start the same backend environment consistently. No paid server is required for the first development phase.
 
 Conceptual architecture:
 
 ```text
-Qt Desktop App -> REST API -> Backend Service -> Database
+Figma Design Prototype -> Flutter App -> REST API -> FastAPI Backend -> PostgreSQL
+                              |
+                              +-> Drift/SQLite Local Storage
 ```
 
-The Qt desktop app handles the user interface and local interaction. The backend handles shared functions such as friend connections, shared availability, schedule requests, and notification synchronization.
+The Flutter app handles the user interface, local interaction, private planning data, reminders, and offline behavior across supported mobile and desktop platforms. The backend handles shared functions such as account authentication, friend connections, shared availability, schedule requests, shared events, and notification synchronization.
 
 ### 2.2 Product Functions and Goals
 
-The main goal of Planora is to help users organize personal time clearly and coordinate schedules with trusted people without losing control over privacy.
+The main goal of Blocalm is to help users organize personal time clearly and coordinate schedules with trusted people without losing control over privacy.
 
 The application should support users in:
 
@@ -169,7 +181,7 @@ The application is mainly designed for individual use. Social scheduling is incl
 
 ### 2.5 Assumptions
 
-- Users have basic computer skills and can operate a desktop application.
+- Users have basic computer or mobile skills and can operate a modern calendar/planner application.
 - The first version is developed for a small group of approximately 5 users.
 - Users have internet access for social scheduling features.
 - Personal calendar and task data can be stored locally.
@@ -178,17 +190,23 @@ The application is mainly designed for individual use. Social scheduling is incl
 
 ### 2.6 Dependencies
 
-- A stable desktop operating system is required to run the Qt application.
-- A local database or equivalent storage layer is required for local calendar and task data.
-- A backend service is required for friend connections, shared availability, schedule requests, and synchronized notifications.
+- Supported mobile and desktop operating systems are required for the selected Flutter targets.
+- The Flutter SDK and Dart toolchain are required to build the frontend application.
+- Drift/SQLite or an equivalent local storage layer is required for private local calendar and task data.
+- A FastAPI backend service is required for account handling, friend connections, shared availability, schedule requests, shared events, and synchronized notifications.
+- PostgreSQL is required for backend/shared data during development.
 - Reliable network connectivity is required for social scheduling features.
-- CMake is required to configure and build the desktop application.
-- Docker may be used to run backend and database services in a repeatable development environment.
+- Docker Compose should be used to run backend and database services in a repeatable development environment.
 
 ### 2.7 Constraints
 
-- Version 1.0 shall be a desktop application.
-- The application shall be developed using Qt and CMake.
+- Version 1.0 shall be planned as a cross-platform application with mobile and desktop support.
+- Flutter is the preferred frontend framework for Version 1.0.
+- Figma shall be used for design, prototyping, and handoff, not as the production frontend.
+- The backend should use FastAPI and expose a REST API or equivalent lightweight API.
+- Backend/shared data should be stored in PostgreSQL during development.
+- The backend API and PostgreSQL database should run through Docker Compose during development.
+- Private calendar and task data should be stored locally through Drift/SQLite or an equivalent local app database.
 - Version 1.0 shall focus on calendar and planner functionality only.
 - Journaling and mood tracking are not part of the Version 1.0 implementation.
 - The project shall avoid paid hosting during the early development phase.
@@ -201,7 +219,7 @@ The following overview summarizes the planned Version 1.0 use cases.
 
 | Use Case ID | Use Case Name | Description | Actors |
 | --- | --- | --- | --- |
-| UC-V1-001 | Perform User Registration | A user creates a Planora account using required account information. | User |
+| UC-V1-001 | Perform User Registration | A user creates a Blocalm account using required account information. | User |
 | UC-V1-002 | Perform User Login | A registered user signs in to access local and synchronized planning data. | User |
 | UC-V1-003 | Create Calendar Event | A user creates a new calendar event with time, category, reminder, and visibility data. | User |
 | UC-V1-004 | Edit Calendar Event | A user modifies an existing event. | User |
@@ -731,7 +749,7 @@ Acceptance criteria:
 
 - Core functions such as creating events, viewing tasks, and responding to requests are easy to find.
 - A new user can create a basic calendar event within a few clicks.
-- The interface follows common desktop application patterns.
+- The interface follows platform-appropriate mobile and desktop application patterns.
 
 #### NFR-V1-002: Clear Calendar Representation
 
@@ -781,7 +799,7 @@ The application shall persist local planning data reliably.
 
 Acceptance criteria:
 
-- Events, tasks, categories, reminders, and privacy settings are stored after application restart.
+- Events, tasks, categories, reminders, and privacy settings are stored in Drift/SQLite or an equivalent local app database after application restart.
 - Failed saves display an error and do not silently discard user input.
 - The application avoids corrupting existing local data during normal use.
 
@@ -864,14 +882,14 @@ Acceptance criteria:
 
 ### 4.6 Supportability Requirements
 
-#### NFR-V1-015: Maintainable Qt and CMake Project
+#### NFR-V1-015: Maintainable Flutter Project
 
 The application shall be structured so that student developers can build, run, and maintain it.
 
 Acceptance criteria:
 
 - Build instructions are documented.
-- CMake configuration is kept understandable.
+- Flutter project setup is kept understandable.
 - UI, local data, and backend integration concerns are separated where practical.
 
 #### NFR-V1-016: Local Backend Setup
@@ -880,16 +898,32 @@ The backend should be easy to run in a local development environment.
 
 Acceptance criteria:
 
-- Developers can start the backend locally.
-- Docker may be used to simplify backend and database setup.
+- Developers can start the backend locally with Docker Compose.
+- Docker Compose starts the FastAPI backend service and PostgreSQL database together.
+- Backend configuration uses documented environment variables.
 - Backend configuration avoids paid hosting for the first development phase.
+
+#### NFR-V1-017: Backend Data Persistence
+
+The backend shall persist shared scheduling and account data reliably.
+
+Acceptance criteria:
+
+- User accounts, password hashes, trusted contacts, schedule requests, shared events, and synchronized notifications are stored in PostgreSQL or an equivalent backend database.
+- Backend schema changes are managed through documented migrations or a comparable repeatable process.
+- Development seed data can be recreated for testing without depending on real user data.
 
 ### 4.7 Design Constraints
 
-- The desktop client shall use Qt.
-- The project shall use CMake.
+- The app frontend should use Flutter as the preferred cross-platform framework.
+- Figma shall be used for UI design, prototyping, and developer handoff.
+- The production app shall be implemented in code and shall not depend on Figma as the runtime frontend.
+- The app should reuse as much frontend code as practical across mobile and desktop targets.
 - The application shall prioritize local-first behavior.
-- The backend shall be lightweight and focused on shared features.
+- The backend shall use FastAPI or an equivalent lightweight REST API framework and remain focused on shared features.
+- Backend/shared data shall be stored in PostgreSQL or an equivalent relational database.
+- Docker Compose shall be the standard local development setup for the backend and database.
+- Private local app data shall be stored through Drift/SQLite or an equivalent local storage layer.
 - Version 1.0 shall not implement journaling, mood tracking, or mood intelligence.
 - Version 1.0 shall support English only.
 
@@ -897,11 +931,11 @@ Acceptance criteria:
 
 #### User Interface
 
-The main user interface is a Qt desktop application. It shall include views for calendar navigation, tasks, reminders, schedule requests, friends, notifications, and settings.
+The main user interface is a Flutter application targeting supported mobile and desktop platforms. It shall include views for calendar navigation, tasks, reminders, schedule requests, friends, notifications, and settings.
 
 #### Backend Interface
 
-The desktop client shall communicate with the backend through a REST API or equivalent lightweight API. Expected backend areas include:
+The Flutter client shall communicate with the FastAPI backend through a REST API or equivalent lightweight API. Expected backend areas include:
 
 - account registration and login
 - trusted contacts
@@ -910,15 +944,46 @@ The desktop client shall communicate with the backend through a REST API or equi
 - shared events
 - synchronized notifications
 
+During development, the backend API shall run through Docker Compose together with the backend database.
+
+#### Backend Database Interface
+
+The backend shall use PostgreSQL or an equivalent relational database for shared and account-related data.
+
+Expected backend data includes:
+
+- user accounts and password hashes
+- trusted contact relationships
+- limited availability data
+- schedule request states
+- shared events
+- synchronized notifications
+
 #### Local Storage Interface
 
-The desktop client shall use local storage for personal planning data such as events, tasks, reminders, categories, and privacy settings.
+The app client shall use Drift/SQLite or an equivalent local storage layer for private personal planning data such as events, tasks, reminders, categories, and privacy settings.
 
 #### Notification Interface
 
 Version 1.0 shall support in-app notifications. Optional email notifications are a could-have feature.
 
-### 4.9 Licensing and Legal Requirements
+### 4.9 Data Storage and Synchronization Boundary
+
+| Data Type | Default Location | Synchronization Rule |
+| --- | --- | --- |
+| Private events | Drift/SQLite local app storage | Not synchronized unless explicitly shared or needed as limited busy/free availability according to privacy settings. |
+| Private tasks | Drift/SQLite local app storage | Not synchronized in Version 1.0 unless a later approved requirement changes this. |
+| Time blocks | Drift/SQLite local app storage | Used locally for planning and conflict checks; only limited availability may be shared. |
+| Categories and privacy settings | Drift/SQLite local app storage | Stored locally unless needed to enforce shared visibility rules. |
+| Reminders | Drift/SQLite local app storage | Triggered in-app where supported. |
+| User accounts and password hashes | PostgreSQL backend database | Required for login and shared scheduling. |
+| Trusted contacts | PostgreSQL backend database | Required for friend connections and schedule requests. |
+| Limited availability | PostgreSQL backend database | Only free/busy or explicitly allowed availability data is synchronized. |
+| Schedule requests | PostgreSQL backend database | Required for sender/recipient coordination. |
+| Shared events | PostgreSQL backend database and local app cache | Synchronized only for accepted participants. |
+| Synchronized notifications | PostgreSQL backend database and local app cache | Synchronized when related to shared features. |
+
+### 4.10 Licensing and Legal Requirements
 
 - The project should use free or open-source tools where possible.
 - Paid hosting is not required during the first development phase.
@@ -960,7 +1025,7 @@ flowchart LR
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora desktop and backend account system |
+| Scope | Blocalm app and backend account system |
 | Stakeholders | User wants an account; project team needs reliable account creation. |
 | Preconditions | The application is installed and the backend account service is available. |
 | Postconditions | A new user account and basic profile exist. |
@@ -986,7 +1051,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora desktop and backend account system |
+| Scope | Blocalm app and backend account system |
 | Stakeholders | User wants access to personal planning data. |
 | Preconditions | The user has an existing account. |
 | Postconditions | The user is authenticated and reaches the dashboard. |
@@ -1010,7 +1075,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora calendar |
+| Scope | Blocalm calendar |
 | Stakeholders | User wants to record planned activities. |
 | Preconditions | The user is logged in or has local access to the planner. |
 | Postconditions | The event is saved and visible in the calendar. |
@@ -1036,7 +1101,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora calendar |
+| Scope | Blocalm calendar |
 | Stakeholders | User wants to correct or update an existing event. |
 | Preconditions | The event exists and belongs to the user or is editable by the user. |
 | Postconditions | The updated event is saved and displayed. |
@@ -1061,7 +1126,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora calendar |
+| Scope | Blocalm calendar |
 | Stakeholders | User wants to remove an event. |
 | Preconditions | The event exists and can be deleted by the user. |
 | Postconditions | The event is removed from the calendar. |
@@ -1086,7 +1151,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora calendar |
+| Scope | Blocalm calendar |
 | Stakeholders | User wants a clear overview of planned time. |
 | Preconditions | Calendar data exists or the calendar is empty. |
 | Postconditions | The selected calendar period is displayed. |
@@ -1110,7 +1175,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora planner |
+| Scope | Blocalm planner |
 | Stakeholders | User wants to track work or personal tasks. |
 | Preconditions | The user has access to the planner. |
 | Postconditions | The task is saved and visible in the task list. |
@@ -1134,7 +1199,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora planner |
+| Scope | Blocalm planner |
 | Stakeholders | User wants to track progress. |
 | Preconditions | At least one task exists. |
 | Postconditions | The task status is updated and stored. |
@@ -1156,7 +1221,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora calendar |
+| Scope | Blocalm calendar |
 | Stakeholders | User wants to reserve focused or routine time. |
 | Preconditions | The user has access to the calendar. |
 | Postconditions | The time block is saved and displayed. |
@@ -1180,7 +1245,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora calendar |
+| Scope | Blocalm calendar |
 | Stakeholders | User wants to schedule repeated activities. |
 | Preconditions | The user is creating or editing an event. |
 | Postconditions | The recurrence rule and occurrences are stored. |
@@ -1204,7 +1269,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actor | System |
-| Scope | Planora reminders |
+| Scope | Blocalm reminders |
 | Stakeholders | User wants timely reminders. |
 | Preconditions | An event or task exists. |
 | Postconditions | A reminder is scheduled or removed. |
@@ -1227,7 +1292,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora privacy |
+| Scope | Blocalm privacy |
 | Stakeholders | User wants control over calendar privacy; friends need limited availability. |
 | Preconditions | The user is creating or editing an event. |
 | Postconditions | The event visibility setting is saved and enforced. |
@@ -1250,7 +1315,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actor | Friend / Trusted Contact |
-| Scope | Planora social scheduling |
+| Scope | Blocalm social scheduling |
 | Preconditions | Both users have accounts. |
 | Postconditions | A trusted contact connection is created after acceptance. |
 
@@ -1272,7 +1337,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actor | Friend / Trusted Contact |
-| Scope | Planora social scheduling |
+| Scope | Blocalm social scheduling |
 | Preconditions | A trusted contact relationship exists. |
 | Postconditions | The user sees limited availability information. |
 
@@ -1292,7 +1357,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actor | Friend / Trusted Contact |
-| Scope | Planora social scheduling |
+| Scope | Blocalm social scheduling |
 | Preconditions | The recipient is a trusted contact. |
 | Postconditions | A pending schedule request exists. |
 
@@ -1314,7 +1379,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | Friend / Trusted Contact |
 | Supporting Actor | User |
-| Scope | Planora social scheduling |
+| Scope | Blocalm social scheduling |
 | Preconditions | A pending request exists. |
 | Postconditions | The request status is updated. |
 
@@ -1336,7 +1401,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | Friend / Trusted Contact |
 | Supporting Actor | User |
-| Scope | Planora social scheduling |
+| Scope | Blocalm social scheduling |
 | Preconditions | A pending request exists. |
 | Postconditions | A counterproposal is sent. |
 
@@ -1358,7 +1423,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actors | Friends / Trusted Contacts |
-| Scope | Planora social scheduling |
+| Scope | Blocalm social scheduling |
 | Preconditions | Trusted contacts exist. |
 | Postconditions | A group event is created for accepted participants. |
 
@@ -1380,7 +1445,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actor | System |
-| Scope | Planora notifications |
+| Scope | Blocalm notifications |
 | Preconditions | A reminder, request, or schedule update occurs. |
 | Postconditions | The user can view the notification. |
 
@@ -1401,7 +1466,7 @@ Extensions:
 | Field | Description |
 | --- | --- |
 | Primary Actor | User |
-| Scope | Planora privacy and data control |
+| Scope | Blocalm privacy and data control |
 | Preconditions | The user has data to export. |
 | Postconditions | An export file is produced. |
 
@@ -1423,7 +1488,7 @@ Extensions:
 | --- | --- |
 | Primary Actor | User |
 | Supporting Actor | System |
-| Scope | Planora privacy and account management |
+| Scope | Blocalm privacy and account management |
 | Preconditions | The user is authenticated. |
 | Postconditions | The user's account and data are deleted or anonymized according to privacy rules. |
 
@@ -1472,7 +1537,7 @@ Each requirement should be traceable to a user need, use case, system function, 
 
 ## 7. Future Version Scope
 
-The following roadmap is outside the detailed Version 1.0 scope but remains part of the longer Planora vision.
+The following roadmap is outside the detailed Version 1.0 scope but remains part of the longer Blocalm vision.
 
 | Version | Theme | Scope |
 | --- | --- | --- |
@@ -1495,8 +1560,8 @@ The following roadmap is outside the detailed Version 1.0 scope but remains part
 
 ## 9. Conclusion
 
-This Software Requirements Specification defines Planora Version 1.0 as a desktop-based personal productivity and scheduling application. The first version focuses on calendar, planner, task, reminder, privacy, and trusted scheduling features.
+This Software Requirements Specification defines Blocalm Version 1.0 as a cross-platform personal productivity and scheduling application for mobile and desktop targets. The first version focuses on calendar, planner, task, reminder, privacy, and trusted scheduling features.
 
 More advanced reflection features such as journaling, mood tracking, color-wheel visualization, avatar representation, and machine-learning-based mood analysis are planned for future versions.
 
-By separating Version 1.0 from future extensions, the team can first develop a stable and useful core application before expanding Planora into a more advanced reflection and mood-awareness platform.
+By separating Version 1.0 from future extensions, the team can first develop a stable and useful core application before expanding Blocalm into a more advanced reflection and mood-awareness platform.
