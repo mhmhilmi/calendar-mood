@@ -1,17 +1,17 @@
-# Planora — UI Prototype (V1.0)
+# Blocalm — UI Prototype (V1.0)
 
-This folder contains the visual UI prototype for **Planora V1.0** (the calendar + planner + trusted-scheduling release described in `doc/01_Requirements/Planora_Software_Requirements_Plan.docx`).
+This folder contains the visual UI prototype for **Blocalm V1.0** (the calendar + planner + trusted-scheduling release described in `doc/01_Requirements/Blocalm_Requirement_Specification.md`).
 
 ## What's in here
 
 | File | Purpose |
 | --- | --- |
-| `planora_dashboard.html` | Single-file clickable prototype of the V1.0 main dashboard. Opens in any browser. |
+| `Blocalm_dashboard.html` | Single-file clickable prototype of the V1.0 main dashboard. Opens in any browser. |
 | `README.md` | This file. |
 
 ## How to open
 
-Just double-click `planora_dashboard.html` — it opens in your default browser. No build step, no dependencies (Inter and Fraunces fonts load from Google Fonts; everything else is inline).
+Just double-click `Blocalm_dashboard.html` — it opens in your default browser. No build step, no dependencies (Inter and Fraunces fonts load from Google Fonts; everything else is inline).
 
 ## What the prototype shows
 
@@ -37,22 +37,24 @@ The dashboard demonstrates the following V1.0 requirements visually:
 - **Aesthetic:** clean and modern, with a soft warm-neutral background (`#FAF9F6`) and a calm purple-indigo accent (`#6E5BD9`). Designed to feel friendly to students and working professionals, and to leave visual room for the future mood-tracking direction (V3.0+) without committing to it now.
 - **Typography:** Inter for UI, Fraunces (serif) for titles and date headings — gives the planner a slightly editorial, journal-like feel.
 - **Category palette:** five soft pastels for Work / Personal / Health / Social / Study, paired with darker fg tones for accessibility.
-- **Layout:** three columns — left nav (240px), main calendar (flex), right rail (320px) — matches what the Qt Widgets shell will look like.
+- **Layout:** three columns — left nav (240px), main calendar (flex), right rail (320px) — provides a desktop/tablet reference for the Flutter app. Mobile layouts should adapt this into bottom navigation or a compact rail plus stacked panels.
 
-## Suggested next step: translate to Qt
+## Suggested next step: translate to Flutter
 
-The plan from the SRP (Milestone M3) is a **Qt desktop prototype**. Based on the chosen split (Qt Widgets shell + QML for fancy parts), here's a clean translation path:
+The current project direction is a **Flutter cross-platform app** supported by Figma design/prototyping and a FastAPI backend. This HTML file should be treated as a visual reference for the first Flutter implementation, not as production frontend code.
 
-| HTML element | Qt translation |
+| HTML element | Flutter translation |
 | --- | --- |
-| Top bar | `QWidget` with horizontal layout, custom `QLineEdit` for search |
-| Sidebar | `QListWidget` with custom delegate for the colored dot + label |
-| Calendar week grid | **QML `Item` with a `Repeater`** — easier for animated event blocks, drag-to-resize, drag-to-reschedule |
-| Right rail (tasks, requests, friends) | `QWidget` panel with sub-widgets, or QML `Column` |
-| New Event modal | `QDialog` with `QVBoxLayout`, or QML `Popup` |
-| Color tokens | Define once in a `Theme.qml` (QML) or a global `QPalette` (Widgets) |
+| Top bar | `AppBar` or custom `PreferredSize` widget with search field and actions |
+| Sidebar | `NavigationRail` on desktop/tablet; `NavigationBar` or drawer on mobile |
+| Calendar week grid | Custom `Widget` using `GridView`, `Stack`, and positioned event blocks |
+| Right rail (tasks, requests, friends) | Responsive side panel on wide screens; stacked sections or tabs on mobile |
+| New Event modal | `showDialog`, `AlertDialog`, or modal bottom sheet depending on screen size |
+| Color tokens | Define once in `ThemeData`, custom color extension, or shared design-token file |
+| Local data | Persist private events, tasks, reminders, categories, and privacy settings with Drift/SQLite |
+| Backend data | Connect shared features to the FastAPI REST API backed by PostgreSQL |
 
-The HTML file uses CSS variables for all colors and spacing — those map directly to Qt theme constants you can define centrally.
+The HTML file uses CSS variables for all colors and spacing. These should be converted into Flutter theme tokens so the app keeps a consistent visual language across mobile and desktop.
 
 ## What's NOT in this prototype yet
 
@@ -70,4 +72,4 @@ These are deliberately deferred and can be added in follow-up screens:
 When you and your friend review this, the easiest workflow is:
 1. Open the file, click around (try the FAB, click an event, try the category pills, check off a task).
 2. Note what you'd change — colors, spacing, missing fields, layout.
-3. Tell Claude what to adjust, or request additional screens (auth, settings, month view, etc.).
+3. Record the feedback as design notes or issues, then translate approved changes into the Figma design and Flutter implementation.
